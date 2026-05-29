@@ -1,0 +1,38 @@
+# ---- Build output ----
+target/
+build/
+*.class
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- Secrets / environment (NEVER commit real values) ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.keystore
+secrets/
+
+# ---- Maven wrapper: keep scripts + properties, ignore any downloaded distro/jar ----
+.mvn/wrapper/maven-wrapper.jar
+.mvn/.develocity/
+
+# ---- IDE / tooling ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+bin/
+
+# ---- OS noise ----
+.DS_Store
+Thumbs.db
