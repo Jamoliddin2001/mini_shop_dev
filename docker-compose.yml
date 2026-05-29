@@ -1,0 +1,68 @@
+# Mini-shop full local stack: postgres + backend + frontend.
+# Brings up the whole app with one command:  docker compose up --build
+# All credentials come from the environment (.env). The JWT_SECRET has a DEV-ONLY default
+# so the stack runs out of the box — OVERRIDE it in production via .env (see .env.example).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mini-shop-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-minishop}
+      POSTGRES_USER: ${POSTGRES_USER:-minishop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-minishop}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-minishop} -d ${POSTGRES_DB:-minishop}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: mini-shop-backend
+    depends_on:
+      postgres:
+        # Wait until PostgreSQL is accepting connections — Flyway runs migrations
+        # (incl. the admin + product seeds) on startup, so the DB must be ready first.
+        condition: service_healthy
+    environment:
+      # Datasource points at the `postgres` service on the compose network, NOT localhost.
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-minishop}
+      DB_USER: ${POSTGRES_USER:-minishop}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-minishop}
+      # DEV-ONLY default secret so the stack boots without manual setup.
+      # ⚠ In production, set JWT_SECRET in .env to your own base64 key (>= 256 bits).
+      JWT_SECRET: ${JWT_SECRET:-JaG47vdP3K0cXXFpDQU9cKzcGLJIEQn4mtpJ3YlsryYRoX0ZClQgpmtHQmgK5VDs}
+      JWT_TTL: ${JWT_TTL:-PT1H}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      # The browser talks to the frontend origin and nginx proxies /api, so requests are
+      # same-origin (no CORS). Kept aligned with the published frontend port for direct calls.
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8081}
+    # 8080 is reachable by the frontend over the compose network; not published to the host.
+    # Uncomment to hit the API directly for debugging:
+    # ports:
+    #   - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: mini-shop-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8081}:80"
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

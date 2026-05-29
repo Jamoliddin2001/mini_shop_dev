@@ -1,0 +1,30 @@
+# Secrets / local env
+.env
+*.env.local
+
+# Java / Maven
+backend/target/
+*.class
+*.log
+
+# Maven wrapper: keep scripts and config, ignore the downloaded jar
+**/maven-wrapper.jar
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# AI tooling (local developer context, not part of the project source)
+.claude/
+.ai-factory/
+.ai-factory.json
+CLAUDE.md
+TechnicalSpecification.txt
