@@ -1,0 +1,15 @@
+# Keep the build context small and reproducible — never ship build output or secrets.
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+.env
+*.env.local
+*.log
+.DS_Store
+
+# Docker artifacts themselves don't belong in the build context.
+Dockerfile
+.dockerignore
