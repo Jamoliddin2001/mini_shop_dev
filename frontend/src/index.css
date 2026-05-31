@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reusable component classes so feature code (forms, layout) stays DRY instead of
+   repeating long utility chains. Kept minimal — extend as real pages arrive. */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium
+      transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1
+      disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-500 text-white hover:bg-brand-600;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-brand-600 hover:bg-brand-50;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600;
+  }
+
+  .input {
+    @apply block w-full rounded-md border border-surface-border bg-white px-3 py-2 text-sm
+      text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none
+      focus:ring-1 focus:ring-brand-500;
+  }
+
+  .input-error {
+    @apply border-danger-500 focus:border-danger-500 focus:ring-danger-500;
+  }
+
+  .card {
+    @apply rounded-card border border-surface-border bg-surface p-6 shadow-sm;
+  }
+
+  .field-error {
+    @apply mt-1 text-xs text-danger-600;
+  }
+
+  /* Small status pill, e.g. order status (NEW/PAID/CANCELLED). */
+  .badge {
+    @apply inline-flex items-center rounded px-2 py-0.5 text-xs font-medium uppercase
+      tracking-wide;
+  }
+
+  /* Loading indicator used by QueryState. */
+  .spinner {
+    @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-surface-border
+      border-t-brand-500;
+  }
+}
+
+body {
+  @apply bg-surface-muted text-slate-900 antialiased;
+}
