@@ -1,5 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom';
-import { useGetCartQuery, useRemoveFromCartMutation } from '@/features/cart/cartApi';
+import { useGetCartQuery, useAddToCartMutation, useRemoveFromCartMutation } from '@/features/cart/cartApi';
 import { useCreateOrderMutation } from '@/features/orders/ordersApi';
 import QueryState from '@/shared/ui/QueryState';
 import { formatPrice } from '@/shared/lib/format';
@@ -14,6 +14,7 @@ import { logger } from '@/shared/lib/logger';
 export default function CartPage() {
   const navigate = useNavigate();
   const { data: cart, isLoading, isError, error, refetch } = useGetCartQuery();
+  const [addToCart, { isLoading: isAdding }] = useAddToCartMutation();
   const [removeFromCart, { isLoading: isRemoving }] = useRemoveFromCartMutation();
   const [createOrder, { isLoading: isPlacing, error: checkoutError }] = useCreateOrderMutation();
 
@@ -40,7 +41,7 @@ export default function CartPage() {
         onRetry={refetch}
       >
         {/* QueryState short-circuits on isEmpty, so here the cart always has items. */}
-        <div className="card">
+        <div className={`card${isPlacing ? ' opacity-60 pointer-events-none' : ''}`}>
           <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-surface-border text-left text-slate-500">
@@ -56,7 +57,28 @@ export default function CartPage() {
                   <tr key={item.productId} className="border-b border-surface-border last:border-0">
                     <td className="py-3">{item.productName}</td>
                     <td className="py-3">{formatPrice(item.unitPrice)}</td>
-                    <td className="py-3">{item.quantity}</td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          className="btn-ghost px-2 py-0 text-lg leading-none"
+                          onClick={() => removeFromCart(item.productId)}
+                          disabled={isRemoving || isAdding || item.quantity !== 1}
+                          title={item.quantity > 1 ? 'Уменьшение на 1 не поддерживается — удалите товар' : 'Убрать товар'}
+                        >
+                          −
+                        </button>
+                        <span className="w-6 text-center">{item.quantity}</span>
+                        <button
+                          type="button"
+                          className="btn-ghost px-2 py-0 text-lg leading-none"
+                          onClick={() => addToCart({ productId: item.productId, quantity: 1 })}
+                          disabled={isAdding || isRemoving}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
                     <td className="py-3 font-medium">{formatPrice(item.lineTotal)}</td>
                     <td className="py-3 text-right">
                       <button
@@ -94,7 +116,20 @@ export default function CartPage() {
               onClick={handleCheckout}
               disabled={isPlacing || !cart || cart.items.length === 0}
             >
-              {isPlacing ? 'Оформляем…' : 'Оформить заказ'}
+              {isPlacing ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg
+                    className="h-4 w-4 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Оформляем…
+                </span>
+              ) : 'Оформить заказ'}
             </button>
         </div>
       </QueryState>

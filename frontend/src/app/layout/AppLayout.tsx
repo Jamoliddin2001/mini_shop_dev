@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout, selectIsAuthenticated, selectUser } from '@/features/auth/authSlice';
 import { useAuthBootstrap } from '@/features/auth/useAuthBootstrap';
+import { useGetCartQuery } from '@/features/cart/cartApi';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-sm font-medium transition-colors ${
@@ -19,6 +20,9 @@ export default function AppLayout() {
   const user = useAppSelector(selectUser);
 
   useAuthBootstrap();
+
+  const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
+  const cartCount = cart?.totalItems ?? 0;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -40,7 +44,14 @@ export default function AppLayout() {
             {isAuthenticated && (
               <>
                 <NavLink to="/cart" className={navLinkClass}>
-                  Корзина
+                  <span className="relative">
+                    Корзина
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-3 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    )}
+                  </span>
                 </NavLink>
                 <NavLink to="/orders" className={navLinkClass}>
                   Заказы
