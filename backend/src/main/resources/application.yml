@@ -22,6 +22,15 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: false
+    repair-on-migrate: true
+
+  graphql:
+    path: /graphql
+    graphiql:
+      enabled: false   # playground отключён в prod; включается в dev-профиле ниже
+    schema:
+      printer:
+        enabled: false
 
   # Pagination defaults for all list endpoints. max-page-size caps client-supplied
   # ?size= so a single request cannot pull an unbounded result set.
@@ -70,6 +79,9 @@ spring:
   config:
     activate:
       on-profile: dev
+  graphql:
+    graphiql:
+      enabled: true    # playground доступен на /graphiql в dev
 
 management:
   endpoint:
@@ -81,6 +93,7 @@ logging:
     com.shop: DEBUG
     org.hibernate.SQL: DEBUG
     org.flywaydb: DEBUG
+    org.springframework.graphql: DEBUG
 
 ---
 # Production profile: stricter logging, no SQL noise.

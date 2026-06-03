@@ -61,6 +61,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- GraphQL: Spring for GraphQL over HTTP (POST /graphql) + browser playground (/graphiql) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+
         <!-- Caching: Spring Cache abstraction + Caffeine (local, in-JVM) provider.
              Caffeine version is managed by the Spring Boot parent BOM. -->
         <dependency>
@@ -127,6 +133,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- GraphQL testing: HttpGraphQlTester, GraphQlTester -->
+        <dependency>
+            <groupId>org.springframework.graphql</groupId>
+            <artifactId>spring-graphql-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

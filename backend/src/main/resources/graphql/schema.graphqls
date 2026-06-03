@@ -1,0 +1,57 @@
+type Query {
+    product(id: ID!): Product
+    products(filter: ProductFilterInput, page: Int = 0, size: Int = 20): ProductPage!
+}
+
+type Mutation {
+    createProduct(input: CreateProductInput!): Product!
+    updateProduct(id: ID!, input: UpdateProductInput!): Product!
+    deleteProduct(id: ID!): Boolean!
+}
+
+# ─── Output types ─────────────────────────────────────────────────────────────
+
+type Product {
+    id: ID!
+    name: String!
+    description: String
+    # Float: graphql-java coerces BigDecimal ↔ Float transparently
+    price: Float!
+    imageUrl: String
+    categoryId: ID
+    categoryName: String
+    createdAt: String!
+}
+
+type ProductPage {
+    content: [Product!]!
+    page: Int!
+    size: Int!
+    totalElements: Int!
+    totalPages: Int!
+}
+
+# ─── Input types ──────────────────────────────────────────────────────────────
+
+input ProductFilterInput {
+    name: String
+    categoryId: ID
+    minPrice: Float
+    maxPrice: Float
+}
+
+input CreateProductInput {
+    name: String!
+    description: String
+    price: Float!
+    imageUrl: String
+    categoryId: ID
+}
+
+input UpdateProductInput {
+    name: String!
+    description: String
+    price: Float!
+    imageUrl: String
+    categoryId: ID
+}

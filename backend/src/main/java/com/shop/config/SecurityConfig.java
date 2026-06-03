@@ -63,7 +63,8 @@ public class SecurityConfig {
                                                    @Value("${security.headers.hsts-enabled:false}") boolean hstsEnabled)
             throws Exception {
         log.info("Configuring stateless JWT security: public=[POST /api/auth/**, GET /api/products/**, "
-                + "GET /api/categories/**, /actuator/health], ADMIN=[write /api/products/**], "
+                + "GET /api/categories/**, /actuator/health, POST /graphql, /graphiql/**], "
+                + "ADMIN=[write /api/products/**], "
                 + "headers=[nosniff, frame-deny, no-referrer, CSP default-src 'none'], hsts={}", hstsEnabled);
 
         http
@@ -89,6 +90,9 @@ public class SecurityConfig {
                         // Public auth + actuator health
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                        // GraphQL transport: авторизация на уровне резолверов (@PreAuthorize)
+                        .requestMatchers(HttpMethod.POST, "/graphql").permitAll()
+                        .requestMatchers("/graphiql/**").permitAll()
                         // Public catalog reads
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
                         // Admin-only catalog writes (forward-compatible rule; enforced now)
